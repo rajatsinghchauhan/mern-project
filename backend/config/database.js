@@ -10,9 +10,6 @@ const connectDB = () => {
     })
     .then((data) => {
       console.log(data.connection.host);
-    })
-    .catch((err) => {
-      console.log(err);
     });
 };
 
