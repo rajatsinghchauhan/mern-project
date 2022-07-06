@@ -20,12 +20,25 @@ class Apifeatures {
   filter = () => {
     const querystrCopy = { ...this.queryStr };
     const removefield = ["keyword", "page", "limit"];
-    console.log(querystrCopy);
+
     removefield.forEach((key) => delete querystrCopy[key]);
     console.log(querystrCopy);
-    this.query = this.query.find(querystrCopy);
-    return this ;
+
+    // filter for price and Rating
+    let queryStr = JSON.stringify(querystrCopy);
+    queryStr = queryStr.replace(/\b(gt|lt|gte|lte)\b/g, (key) => `$${key}`);
+
+    this.query = this.query.find(JSON.parse(queryStr));
+    console.log(queryStr);
+    return this;
   };
+
+  pagination(resultperpage) {
+    const currentpage = Number(this.queryStr.page) || 1;
+    const skip = resultperpage * (currentpage - 1);
+    this.query = this.query.limit(resultperpage).skip(skip);
+    return this;
+  }
 }
 
 module.exports = Apifeatures;

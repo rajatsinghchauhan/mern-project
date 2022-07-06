@@ -10,12 +10,15 @@ exports.createnewproduct = asyncerrorhandler(async (req, res, next) => {
 });
 
 exports.getallproducts = asyncerrorhandler(async (req, res) => {
+  const resultperpage = 5;
+  const productcount = await Product.countDocuments();
   const apifeatures = new Apifeatures(Product.find(), req.query)
     .search()
-    .filter();
+    .filter()
+    .pagination(resultperpage);
 
   const products = await apifeatures.query;
-  res.status(200).json({ success: true, products });
+  res.status(200).json({ success: true, products, productcount });
 });
 //admin controller
 exports.updateaproduct = asyncerrorhandler(async (req, res, next) => {
