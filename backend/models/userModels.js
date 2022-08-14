@@ -60,11 +60,10 @@ userSchema.methods.getjwtToken = function () {
 userSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
-module.exports = mongoose.model("User", userSchema);
 
 //method to reset password
 
-userSchema.methods.getResetToken = function () {
+userSchema.methods.getResetPasswordToken = function () {
   const resetToken = crypto.randomBytes(20).toString("hex");
   this.resetPasswordToken = crypto
     .createHash("sha256")
@@ -73,3 +72,5 @@ userSchema.methods.getResetToken = function () {
   this.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
   return resetToken;
 };
+
+module.exports = mongoose.model("User", userSchema);

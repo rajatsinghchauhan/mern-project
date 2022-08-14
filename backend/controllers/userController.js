@@ -57,9 +57,10 @@ exports.logout = asyncerrorhandler(async (req, res, next) => {
 exports.forgotpassword = asyncerrorhandler(async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
-    return next(new Errorhandler("please enter a valid email", 401));
+    return next(new Errorhandler("please enter a valid email", 404));
   }
-  const resettoken = user.getResetToken();
+
+  const resettoken = user.getResetPasswordToken();
 
   await user.save({ validateBeforeSave: false });
 
@@ -70,7 +71,7 @@ exports.forgotpassword = asyncerrorhandler(async (req, res, next) => {
   const message = `Your url for reset password is \n \n ${resetPasswordUrl} \n \n if not requested please ignore`;
 
   try {
-    sendEmail({
+    await sendEmail({
       email: user.email,
       subject: `Ecommerce password recovery email`,
       message,
