@@ -5,7 +5,9 @@ const User = require("../models/userModels");
 exports.isauthenticatedUser = asyncerrorhandler(async (req, res, next) => {
   const { token } = req.cookies;
   if (!token) {
-    return next(new Errorhandler("please login to view all products", 401));
+    return next(
+      new Errorhandler("please login with credentials to do this task", 401)
+    );
   }
   const decodeData = jwt.verify(token, process.env.JWT_SECRET_KEY);
   req.user = await User.findById(decodeData.id);
