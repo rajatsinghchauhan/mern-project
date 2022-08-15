@@ -3,6 +3,7 @@ const Errorhandler = require("../utils/errorhandler");
 const asyncerrorhandler = require("../middleware/asynErrorHandler");
 const sendToken = require("../utils/jwttoken");
 const sendEmail = require("../utils/sendemail");
+const crypto = require("crypto");
 // function register a new user and provide jwt token
 exports.createUser = asyncerrorhandler(async (req, res, next) => {
   const { name, email, password } = req.body;
@@ -88,4 +89,34 @@ exports.forgotpassword = asyncerrorhandler(async (req, res, next) => {
 
     return next(new Errorhandler(error.message, 500));
   }
+});
+
+exports.resetPassword = asyncerrorhandler(async (req, res, next) => {
+  const resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+  const user = await User.findOne({
+    resetPasswordToken: resetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(
+      new Errorhandler(
+        "Invalid reset password link or it has been expired",
+        400
+      )
+    );
+  }
+  if (req.body.password != req.body.confirmpassword) {
+    return next(
+      new Errorhandler("password and confirm password does not match", 400)
+    );
+  }
+  user.password = req.body.password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+  await user.save({ validateBeforeSave: false });
+  sendToken(user, 200, res);
 });
