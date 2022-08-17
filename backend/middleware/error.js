@@ -11,6 +11,25 @@ module.exports = (err, req, res, next) => {
     err = new Errorhandler(message, 400);
   }
 
+  // to handle error for same email registered already
+  if (err.statusCode == 11000) {
+    const message = ` Duplicate ${Object.keys(
+      err.keyValue
+    )}  already registered`;
+    err = new Errorhandler(message, 400);
+  }
+
+  // wrong jasonwebtoken
+  if (err.name == "JsonWebTokenError") {
+    const message = "Invalid Jason web-token";
+    err = new Errorhandler(message, 401);
+  }
+  // webtoken expired
+  if (error.name == "TokenExpiredError") {
+    const message = " Jason webtoken expired try again";
+    err = new Errorhandler(message, 401);
+  }
+
   res.status(err.statusCode).json({
     success: false,
     error: err.stack,
