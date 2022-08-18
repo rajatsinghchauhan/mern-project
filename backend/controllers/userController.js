@@ -120,3 +120,25 @@ exports.resetPassword = asyncerrorhandler(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
   sendToken(user, 200, res);
 });
+
+// get user profile details
+
+exports.getuserprofile = asyncerrorhandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  return res.status(201).json({
+    success: true,
+    user,
+  });
+});
+
+// update user profile details
+exports.updateuserprofile = asyncerrorhandler(async (req, res, next) => {
+  let user = await User.findByIdAndUpdate(req.user.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  return res.status(200).json({
+    success: true,
+    user,
+  });
+});
