@@ -133,12 +133,119 @@ exports.getuserprofile = asyncerrorhandler(async (req, res, next) => {
 
 // update user profile details
 exports.updateuserprofile = asyncerrorhandler(async (req, res, next) => {
-  let user = await User.findByIdAndUpdate(req.user.id, req.body, {
+  const newuserinfo = {
+    name: req.body.name,
+    email: req.body.email,
+  };
+
+  let user = await User.findByIdAndUpdate(req.user.id, newuserinfo, {
     new: true,
     runValidators: true,
+    useFindAndModify: false,
   });
+  res.status(200).json({ succes: true });
+});
+
+// update user password
+
+exports.updateuserpassword = asyncerrorhandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id).select("+password");
+  const ispasswordmatched = await user.comparePassword(
+    req.body.currentpassword
+  );
+
+  if (!ispasswordmatched) {
+    return next(new Errorhandler("please enter correct current password", 400));
+  }
+  if (req.body.newpassword !== req.body.confirmpassword) {
+    return next(new Errorhandler("please enter correct confirm password", 400));
+  }
+
+  user.password = req.body.newpassword;
+  await user.save({ validateBeforeSave: false });
+  sendToken(user, 200, res);
+});
+
+// function to find total no of users
+
+exports.totalusers = asyncerrorhandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  if (user.role != "admin") {
+    return next(
+      new Errorhandler(
+        "you dont have valid permission for getting this info",
+        400
+      )
+    );
+  }
+
+  Ecommerce.users.count({}, function (err, result) {
+    if (err) {
+      res.send(err);
+    } else {
+      res.json(result);
+    }
+  });
+});
+
+//get all users details
+exports.getallusers = asyncerrorhandler(async (req, res, next) => {
+  // const user = await User.findById(req.user.id);
+  // if (user.role != "admin") {
+  //   return next(
+  //     new Errorhandler(
+  //       "you dont have valid permission for getting this info",
+  //       400
+  //     )
+  //   );
+  // }
+
+  const users = await User.find();
   return res.status(200).json({
     success: true,
+    users,
+  });
+});
+
+//getsingle user details
+
+exports.getsingleuser = asyncerrorhandler(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return next(new Errorhandler("user not found", 404));
+  }
+  return res.status(200).json({
+    succes: true,
     user,
   });
+});
+
+// admin can update user details
+exports.updateusers = asyncerrorhandler(async (req, res, next) => {
+  let user = await User.findById(req.params.id);
+  if (!user) {
+    return new Errorhandler("user doesn't exist", 404);
+  }
+  const newuserinfo = {
+    name: req.body.name,
+    email: req.body.email,
+    role: req.body.role,
+  };
+  user = await User.findByIdAndUpdate(req.params.id, newuserinfo, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false,
+  });
+  res.status(200).json({ succes: true });
+});
+
+// admin can delete a user
+
+exports.deleteuser = asyncerrorhandler(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return new Errorhandler(`user doesn't exist with id ${req.params.id}`, 404);
+  }
+  await user.remove();
+  res.status(200).json({ succes: true });
 });

@@ -25,7 +25,7 @@ module.exports = (err, req, res, next) => {
     err = new Errorhandler(message, 401);
   }
   // webtoken expired
-  if (error.name == "TokenExpiredError") {
+  if (err.name == "TokenExpiredError") {
     const message = " Jason webtoken expired try again";
     err = new Errorhandler(message, 401);
   }
