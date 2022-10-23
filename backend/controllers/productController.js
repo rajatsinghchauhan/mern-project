@@ -109,4 +109,33 @@ exports.getallreviews = asyncerrorhandler(async (req, res, next) => {
 });
 // delete a review
 
-exports.deletereview = asyncerrorhandler(async (req, res, next) => {});
+exports.deletereview = asyncerrorhandler(async (req, res, next) => {
+  const product = await Product.findById(req.query.productId);
+  if (!product) {
+    return next(new Errorhandler("no product exist with this id", 404));
+  }
+  const reviews = product.reviews.filter(
+    (review) => review._id.toString() !== req.query.id.toString()
+  );
+
+  console.log(reviews);
+  const numofreviews = reviews.length;
+  let sum = 0;
+  reviews.forEach((rev) => {
+    sum = sum + rev.rating;
+  });
+  const rating = sum / reviews.length;
+  console.log(rating);
+  await Product.findByIdAndUpdate(
+    req.query.productId,
+    {
+      reviews,
+      rating,
+      numofreviews,
+    },
+    { new: true, runValidators: true, useFindAndModify: false }
+  );
+  res.status(201).json({
+    success: true,
+  });
+});
