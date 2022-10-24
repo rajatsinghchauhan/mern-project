@@ -118,14 +118,13 @@ exports.deletereview = asyncerrorhandler(async (req, res, next) => {
     (review) => review._id.toString() !== req.query.id.toString()
   );
 
-  console.log(reviews);
   const numofreviews = reviews.length;
   let sum = 0;
   reviews.forEach((rev) => {
     sum = sum + rev.rating;
   });
   const rating = sum / reviews.length;
-  console.log(rating);
+
   await Product.findByIdAndUpdate(
     req.query.productId,
     {
