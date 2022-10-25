@@ -7,6 +7,7 @@ const Apifeatures = require("../utils/apifeatures");
 exports.createnewproduct = asyncerrorhandler(async (req, res, next) => {
   req.body.user = req.user.id;
   const product = await Product.create(req.body);
+
   res.status(201).json({ success: true, product: product });
 });
 
@@ -21,7 +22,7 @@ exports.getallproducts = asyncerrorhandler(async (req, res) => {
   const products = await apifeatures.query;
   res.status(200).json({ success: true, products, productcount });
 });
-//admin controller
+//admin controller update a product
 exports.updateaproduct = asyncerrorhandler(async (req, res, next) => {
   let product = await Product.findById(req.params.id);
   if (!product) {

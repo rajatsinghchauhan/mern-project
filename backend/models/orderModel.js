@@ -24,7 +24,7 @@ const orderSchema = new mongoose.Schema({
       required: true,
     },
     phoneNo: {
-      typr: Number,
+      type: Number,
       required: true,
     },
   },
@@ -48,14 +48,14 @@ const orderSchema = new mongoose.Schema({
       },
       product: {
         type: mongoose.Schema.ObjectId,
-        ref: "product",
+        ref: "Product",
         required: true,
       },
     },
   ],
   user: {
     type: mongoose.Schema.ObjectId,
-    ref: "user",
+    ref: "User",
     required: true,
   },
   paymentInfo: {
@@ -82,7 +82,7 @@ const orderSchema = new mongoose.Schema({
     required: true,
     default: 0,
   },
-  shipingPrice: {
+  shippingPrice: {
     type: Number,
     required: true,
     default: 0,
