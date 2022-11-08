@@ -11,8 +11,8 @@ exports.createnewproduct = asyncerrorhandler(async (req, res, next) => {
   res.status(201).json({ success: true, product: product });
 });
 
-exports.getallproducts = asyncerrorhandler(async (req, res) => {
-  const resultperpage = 5;
+exports.getallproducts = asyncerrorhandler(async (req, res, next) => {
+  const resultperpage = 8;
   const productcount = await Product.countDocuments();
   const apifeatures = new Apifeatures(Product.find(), req.query)
     .search()

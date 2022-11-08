@@ -21,7 +21,7 @@ routes
   .put(isauthenticatedUser, authorizeRoles("admin"), updateaproduct)
   .delete(isauthenticatedUser, authorizeRoles("admin"), deleteproduct);
 
-routes.route("/products/:id").get(getsingleproduct);
+routes.route("/product/:id").get(getsingleproduct);
 
 routes.route("/createreview").put(isauthenticatedUser, createreview);
 routes.route("/allreviews").get(isauthenticatedUser, getallreviews);
