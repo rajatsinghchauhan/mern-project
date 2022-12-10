@@ -20,7 +20,9 @@ exports.getallproducts = asyncerrorhandler(async (req, res, next) => {
     .pagination(resultperpage);
 
   const products = await apifeatures.query;
-  res.status(200).json({ success: true, products, productcount });
+  res
+    .status(200)
+    .json({ success: true, products, productcount, resultperpage });
 });
 //admin controller update a product
 exports.updateaproduct = asyncerrorhandler(async (req, res, next) => {
