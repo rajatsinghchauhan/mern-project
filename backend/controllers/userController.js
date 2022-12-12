@@ -1,19 +1,27 @@
 const User = require("../models/userModels");
+
 const Errorhandler = require("../utils/errorhandler");
 const asyncerrorhandler = require("../middleware/asynErrorHandler");
 const sendToken = require("../utils/jwttoken");
 const sendEmail = require("../utils/sendemail");
+const cloudinary = require("cloudinary");
 const crypto = require("crypto");
 // function register a new user and provide jwt token
+
 exports.createUser = asyncerrorhandler(async (req, res, next) => {
+  const mycloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+    folder: "avatars",
+    width: 150,
+    crop: "scale",
+  });
   const { name, email, password } = req.body;
   const user = await User.create({
     name,
     email,
     password,
     avatar: {
-      public_id: "this is a smaple",
-      url: "this is a sample url",
+      public_id: mycloud.public_id,
+      url: mycloud.secure_url,
     },
   });
   sendToken(user, 200, res);
@@ -28,7 +36,8 @@ exports.loginuser = asyncerrorhandler(async (req, res, next) => {
   }
   const user = await User.findOne({ email: email }).select("+password");
   if (!user) {
-    return next(new Errorhandler("Invalid request , no user exist ", 401));
+    console.log("hello");
+    return next(new Errorhandler("Invalid request, no user exist ", 401));
   }
   const ispasswordmatched = await user.comparePassword(password);
   if (!ispasswordmatched) {
@@ -138,12 +147,31 @@ exports.updateuserprofile = asyncerrorhandler(async (req, res, next) => {
     email: req.body.email,
   };
 
+  if (req.body.avatar !== "") {
+    const user = await User.findById(req.user.id);
+
+    const imageId = user.avatar.public_id;
+
+    await cloudinary.v2.uploader.destroy(imageId);
+
+    const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+      folder: "avatars",
+      width: 150,
+      crop: "scale",
+    });
+
+    newuserinfo.avatar = {
+      public_id: myCloud.public_id,
+      url: myCloud.secure_url,
+    };
+  }
+
   let user = await User.findByIdAndUpdate(req.user.id, newuserinfo, {
     new: true,
     runValidators: true,
     useFindAndModify: false,
   });
-  res.status(200).json({ succes: true });
+  res.status(200).json({ success: true });
 });
 
 // update user password
