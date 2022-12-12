@@ -1,7 +1,7 @@
 import React, { useState, Fragment } from "react";
 
 import "./search.css";
-
+import Metadata from "../layout/metadata";
 const Search = ({ history }) => {
   const [keyword, setKeyword] = useState("");
 
@@ -16,6 +16,7 @@ const Search = ({ history }) => {
 
   return (
     <Fragment>
+      <Metadata title="Search" />
       <form className="searchBox" onSubmit={searchSubmitHandler}>
         <input
           type="text"
