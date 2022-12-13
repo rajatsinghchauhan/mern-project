@@ -74,9 +74,10 @@ exports.forgotpassword = asyncerrorhandler(async (req, res, next) => {
 
   await user.save({ validateBeforeSave: false });
 
-  const resetPasswordUrl = `${req.protocol}://${req.get(
-    "host"
-  )}/api/v1/password/reset/${resettoken}`;
+  // const resetPasswordUrl = `${req.protocol}://${req.get(
+  //   "host"
+  // )}/api/v1/password/reset/${resettoken}`;
+  const resetPasswordUrl = `${process.env.FRONTEND_URL}password/reset/${resettoken}`;
 
   const message = `Your url for reset password is \n \n ${resetPasswordUrl} \n \n if not requested please ignore`;
 
@@ -118,7 +119,7 @@ exports.resetPassword = asyncerrorhandler(async (req, res, next) => {
       )
     );
   }
-  if (req.body.password != req.body.confirmpassword) {
+  if (req.body.password != req.body.confirmPassword) {
     return next(
       new Errorhandler("password and confirm password does not match", 400)
     );
@@ -146,7 +147,6 @@ exports.updateuserprofile = asyncerrorhandler(async (req, res, next) => {
     name: req.body.name,
     email: req.body.email,
   };
-
   if (req.body.avatar !== "") {
     const user = await User.findById(req.user.id);
 
@@ -175,22 +175,23 @@ exports.updateuserprofile = asyncerrorhandler(async (req, res, next) => {
 });
 
 // update user password
-
 exports.updateuserpassword = asyncerrorhandler(async (req, res, next) => {
   const user = await User.findById(req.user.id).select("+password");
-  const ispasswordmatched = await user.comparePassword(
-    req.body.currentpassword
-  );
 
-  if (!ispasswordmatched) {
-    return next(new Errorhandler("please enter correct current password", 400));
-  }
-  if (req.body.newpassword !== req.body.confirmpassword) {
-    return next(new Errorhandler("please enter correct confirm password", 400));
+  const isPasswordMatched = await user.comparePassword(req.body.oldPassword);
+
+  if (!isPasswordMatched) {
+    return next(new Errorhandler("Old password is incorrect", 400));
   }
 
-  user.password = req.body.newpassword;
+  if (req.body.newPassword !== req.body.confirmPassword) {
+    return next(new Errorhandler("password does not match", 400));
+  }
+
+  user.password = req.body.newPassword;
+
   await user.save({ validateBeforeSave: false });
+
   sendToken(user, 200, res);
 });
 
