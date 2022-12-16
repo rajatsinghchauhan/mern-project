@@ -244,7 +244,7 @@ exports.getsingleuser = asyncerrorhandler(async (req, res, next) => {
     return next(new Errorhandler("user not found", 404));
   }
   return res.status(200).json({
-    succes: true,
+    success: true,
     user,
   });
 });
@@ -265,7 +265,7 @@ exports.updateusers = asyncerrorhandler(async (req, res, next) => {
     runValidators: true,
     useFindAndModify: false,
   });
-  res.status(200).json({ succes: true });
+  res.status(200).json({ success: true });
 });
 
 // admin can delete a user
@@ -275,6 +275,10 @@ exports.deleteuser = asyncerrorhandler(async (req, res, next) => {
   if (!user) {
     return new Errorhandler(`user doesn't exist with id ${req.params.id}`, 404);
   }
+  const imageId = user.avatar.public_id;
+
+  await cloudinary.v2.uploader.destroy(imageId);
+
   await user.remove();
-  res.status(200).json({ succes: true });
+  res.status(200).json({ success: true, message: "User Deleted Successfully" });
 });
