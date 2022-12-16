@@ -28,7 +28,16 @@ import axios from "axios";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import OrderDetails from "./component/Order/OrderDetails.js";
-
+import Dashboard from "./component/admin/Dashboard.js";
+import ProductList from "./component/admin/ProductList";
+import NewProduct from "./component/admin/NewProduct";
+import UpdateProduct from "./component/admin/UpdateProduct.js";
+import OrderList from "./component/admin/OrderList.js";
+import ProcessOrder from "./component/admin/ProcessOrder.js";
+import UsersList from "./component/admin/UsersList.js";
+import UpdateUser from "./component/admin/UpdateUser.js";
+import ProductReviews from "./component/admin/ProductReviews.js";
+import Contact from "./component/layout/Contact/Contact";
 function App() {
   const { isAuthenticated, user } = useSelector((state) => state.user);
   const [stripeApiKey, setStripeApiKey] = useState("");
@@ -48,6 +57,8 @@ function App() {
       <Header />
       {isAuthenticated && <UserOptions user={user} />}
       <Route exact path={"/"} component={Home} />
+      <Route exact path="/contact" component={Contact} />
+
       <Route exact path="/product/:id" component={ProductDetails} />
       <Route exact path="/products" component={Products} />
       <Route path="/products/:keyword" component={Products} />
@@ -81,6 +92,60 @@ function App() {
         <ProtectedRoute exact path="/order/confirm" component={ConfirmOrder} />
         <ProtectedRoute exact path="/order/:id" component={OrderDetails} />
       </Switch>
+      <ProtectedRoute
+        isAdmin={true}
+        exact
+        path="/admin/dashboard"
+        component={Dashboard}
+      />
+      <ProtectedRoute
+        isAdmin={true}
+        exact
+        path="/admin/products"
+        component={ProductList}
+      />
+      <ProtectedRoute
+        isAdmin={true}
+        exact
+        path="/admin/products/new"
+        component={NewProduct}
+      />
+      <ProtectedRoute
+        isAdmin={true}
+        exact
+        path="/admin/product/:id"
+        component={UpdateProduct}
+      />
+      <ProtectedRoute
+        isAdmin={true}
+        exact
+        path="/admin/allorders"
+        component={OrderList}
+      />
+      <ProtectedRoute
+        isAdmin={true}
+        exact
+        path="/admin/order/:id"
+        component={ProcessOrder}
+      />
+      <ProtectedRoute
+        isAdmin={true}
+        exact
+        path="/admin/allusers"
+        component={UsersList}
+      />
+      <ProtectedRoute
+        isAdmin={true}
+        exact
+        path="/admin/user/:id"
+        component={UpdateUser}
+      />
+      <ProtectedRoute
+        isAdmin={true}
+        exact
+        path="/admin/reviews"
+        component={ProductReviews}
+      />
       <Footer />
     </Router>
   );
